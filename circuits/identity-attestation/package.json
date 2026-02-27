@@ -1,0 +1,25 @@
+{
+  "name": "identity-attestation-circuit",
+  "version": "1.0.0",
+  "description": "ZK Circuit for social identity ownership proof using Groth16",
+  "scripts": {
+    "install:circom": "echo 'Install circom from https://docs.circom.io/getting-started/installation/'",
+    "install:snarkjs": "npm install -g snarkjs",
+    "compile": "./scripts/compile.sh",
+    "setup": "./scripts/trusted-setup.sh",
+    "test": "node test/generate-proof.js && node test/verify-proof.js",
+    "test:generate": "node test/generate-proof.js",
+    "test:verify": "node test/verify-proof.js",
+    "clean": "rm -rf build/* keys/*",
+    "export:vk": "snarkjs zkey export verificationkey keys/identity_attestation.zkey keys/verification_key.json",
+    "export:solidity": "snarkjs zkey export solidityverifier keys/identity_attestation.zkey build/Verifier.sol"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.4"
+  },
+  "devDependencies": {
+    "crypto": "^1.0.1"
+  }
+}

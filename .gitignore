@@ -1,0 +1,43 @@
+# Rust
+target/
+**/*.rs.bk
+
+# Soroban WASM artifacts
+*.wasm
+!circuits/**/*.wasm
+
+# Circuit build artifacts (keep source, exclude large binaries)
+circuits/*/build/
+circuits/*/keys/*.zkey
+circuits/*/keys/*.ptau
+*.r1cs
+*.sym
+*.r1cs.json
+
+# Node
+node_modules/
+.pnpm-store/
+npm-debug.log*
+
+# Environment / secrets
+.env
+.env.*
+deployment_ids.env
+deployment_ids_mainnet.env
+*.secret
+*.key
+.dev.vars
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
