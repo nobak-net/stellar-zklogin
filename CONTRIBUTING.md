@@ -64,6 +64,22 @@ For **security vulnerabilities**, see [SECURITY.md](SECURITY.md) — do not open
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full system architecture and contract dependency graph.
 
+### TypeScript Packages
+
+| Package | Path | What |
+|---------|------|------|
+| `@nobak/stellar-zklogin` | `packages/sdk/` | Client-side SDK (proving, verification, identity) |
+| `@nobak/stellar-zklogin-server` | `packages/server/` | Reference attestation server (Hono/CF Workers) |
+| `stellar-zklogin-demo` | `examples/demo/` | Educational demo site (CF Pages) |
+
+```bash
+# Build all TS packages
+npm run build
+
+# Run all TS tests
+npm test
+```
+
 ### Contract Overview
 
 | Contract | Purpose |
