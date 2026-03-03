@@ -569,7 +569,7 @@ async function handleVerifyOnchain(): Promise<void> {
 
     // Activate wallet after successful on-chain verification
     if (result.success) {
-      initWallet();
+      await initWallet();
     }
   } catch (err: any) {
     $('step-5b-data').textContent = JSON.stringify({ error: err.message }, null, 2);
@@ -584,10 +584,10 @@ async function handleVerifyOnchain(): Promise<void> {
 // Step 6: ZK Wallet
 // ---------------------------------------------------------------------------
 
-function initWallet(): void {
+async function initWallet(): Promise<void> {
   if (!state.identityField) return;
 
-  const wallet = generateOrLoadKeypair(state.identityField);
+  const wallet = await generateOrLoadKeypair(state.identityField);
   state.walletPublicKey = wallet.publicKey;
   state.walletSecretKey = wallet.secretKey;
 
