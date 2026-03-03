@@ -37,7 +37,7 @@ The prover demonstrates (in zero-knowledge) that:
 | Aspect | This circuit | Sui zkLogin circuit |
 |--------|-------------|---------------------|
 | JWT verification | Off-chain (server) | In-circuit (RSA in BN254) |
-| Constraints | ~2,300 | ~100,000+ |
+| Constraints | 2,295 | ~100,000+ |
 | Proving time | ~2-5s (mobile, snarkjs) | ~2-5s (centralized prover) |
 | Trust trade-off | Requires trusted attestation server | Trustless (JWK oracle) |
 | Mobile-friendly | Yes (lightweight circuit) | Typically uses centralized prover |
@@ -104,6 +104,8 @@ The `gmail` prefix is maintained for backward compatibility with existing deploy
    npm install
    ```
 
+> **Note:** Circuit artifacts currently use the legacy `gmail_attestation.*` filenames (WASM, zkey, r1cs). These will be renamed to `identity_attestation.*` after circuit recompilation. The R1CS constraints are unchanged — only the signal name changed (`gmailHash` → `identityHash`). Tracked as finding F4 in [SECURITY_MODEL.md](../../docs/SECURITY_MODEL.md).
+
 ### Build & Test
 
 ```bash
@@ -120,11 +122,56 @@ npm run test:generate
 npm run test:verify
 ```
 
+## Constraint Breakdown
+
+The circuit enforces 5 verification steps totaling ~2,295 constraints:
+
+```
+Step 1: ATTESTATION INTEGRITY (~800 constraints)
+  Poseidon(identityHash, attestationTimestamp, serverNonce) === attestationHash
+  → Verifies the server's attestation matches the claimed identity
+  → Uses 3-input Poseidon hash (most constraint-heavy operation)
+
+Step 2: SERVER BINDING (~500 constraints)
+  serverBindingCheck = Poseidon(serverSecret, 1) == serverPubCommitment
+  → Verifies attestation came from the expected server
+  ⚠️ F10: Signal computed but NEVER CONSTRAINED (no `=== 1`).
+     The check is currently a no-op — see Finding F10 in SECURITY_MODEL.md.
+     Fix: add `serverBindingCheck === 1` or remove dead signal.
+
+Step 3: FRESHNESS CHECKS (~200 constraints)
+  3a. currentTimestamp - attestationTimestamp <= maxAttestationAge
+      → Attestation is not too old (within 24h window)
+  3b. attestationTimestamp <= currentTimestamp
+      → Attestation timestamp is not in the future
+  → Uses LessThan comparators (64-bit range checks)
+
+Step 4: COMMITMENT COMPUTATION (~500 constraints)
+  commitment = Poseidon(identityHash, blinding)
+  → Public output that binds to identity without revealing it
+  → Fresh blinding factor per proof ensures unlinkability
+
+Step 5: NULLIFIER COMPUTATION (~500 constraints)
+  nullifierHash = Poseidon(identityHash, nullifierSecret)
+  → Public output that enables replay prevention
+  → Same identity + same secret = same nullifier (prevents double-registration)
+```
+
+### Why ~2,295 Constraints Is Small
+
+For context: Tornado Cash uses ~30K constraints, Zcash uses ~100K, and many zkEVM circuits exceed 1M. At ~2,295 constraints, this circuit:
+
+- Proves in **2-5 seconds** on mobile (iPhone 12+, Pixel 6+)
+- Generates a **256-byte** proof regardless of input complexity
+- Verifies in **constant time** via 4 BN254 pairings on Soroban
+
+The tradeoff is that the circuit delegates OAuth validation to the API server rather than verifying the JWT signature inside the circuit (which would require RSA inside ZK — feasible but ~100x more constraints).
+
 ## Circuit Statistics
 
 | Metric | Value |
 |--------|-------|
-| Constraints | ~2,300 |
+| Constraints | ~2,295 |
 | Curve | BN254 |
 | Proof system | Groth16 |
 | WASM size | ~2.1 MB |

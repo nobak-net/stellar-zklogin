@@ -256,7 +256,7 @@ Both systems:
 |---|---|---|
 | **Prover** | Centralized prover service (Mysten Labs) or local | Client-side only (snarkjs in WebView/browser) |
 | **Proving time** | ~2-5 seconds (centralized) | ~2-5 seconds (mobile, snarkjs) |
-| **Circuit size** | Not disclosed | ~2,300 constraints |
+| **Circuit size** | Not disclosed | 2,295 constraints |
 | **Witness** | JWT + ephemeral key + user salt | identityHash + attestation + blinding + nullifierSecret |
 
 **Sui's advantage:** Mysten Labs operates a centralized prover service, offloading computation from the client. Users can also prove locally.
@@ -324,7 +324,7 @@ Step 3: Timestamp freshness          LessEqThan(64) ×2  ~200 constraints
 Step 4: Commitment computation       Poseidon(2)        ~500 constraints
 Step 5: Nullifier computation        Poseidon(2)        ~500 constraints
                                                     ─────────────────
-                                     Total:          ~2,300 constraints
+                                     Total:          2,295 constraints
 ```
 
 ### Comparison with Sui's Circuit
@@ -335,7 +335,7 @@ Sui's zkLogin circuit is significantly larger because it verifies the JWT signat
 |---|---|---|
 | JWT parsing | In-circuit | Off-chain (server) |
 | Signature verification | RSA in BN254 (~100K+ constraints) | Poseidon attestation (~800 constraints) |
-| Total constraints | Estimated 100K+ | ~2,300 |
+| Total constraints | Estimated 100K+ | 2,295 |
 | Proving time impact | Heavier (needs prover service) | Lightweight (mobile-friendly) |
 | Trust trade-off | Trustless JWT verification | Trusted attestation server |
 

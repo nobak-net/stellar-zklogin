@@ -35,7 +35,7 @@ Stellar has no oracle protocol support. Building a JWK oracle requires validator
 
 | Metric | Sui (JWK in-circuit) | stellar-zkLogin (attestation) |
 |--------|---------------------|-------------------------------|
-| Circuit constraints | ~100K+ (RSA verification in BN254) | ~2,300 |
+| Circuit constraints | ~100K+ (RSA verification in BN254) | 2,295 |
 | Proving time | Needs prover service | Mobile-friendly (~2-5s) |
 | Trust assumption | Provider HTTPS + validator consensus | Provider API + attestation server |
 
